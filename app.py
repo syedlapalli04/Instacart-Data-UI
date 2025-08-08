@@ -93,7 +93,7 @@ st.subheader("Interactive User Explorer")
 # Interactive User Explorer: show only 5 sample users for performance
 selected_cluster = st.selectbox("Select Cluster", sorted(features["cluster"].unique()))
 cluster_users = features[features["cluster"] == selected_cluster]
-st.write(cluster_users.head(5))
+st.write(cluster_users.head(10))
 
 #sil_score = get_silhouette(scaled, labels)
 #if sil_score:
@@ -106,7 +106,7 @@ st.write(cluster_users[selected_features].describe())
 # Example cluster recommendations
 
 st.subheader("Cluster Recommendations")
-st.write("Reached recommendations section")
+#st.write("Reached recommendations section")
 st.write("cluster_means:")
 st.write(cluster_means)
 def get_recommendation(row):
@@ -121,7 +121,8 @@ def get_recommendation(row):
         return "Average shoppers: Maintain regular promotions and highlight popular products."
 
 cluster_profiles = cluster_means.copy()
-st.write("cluster_profiles before recommendation:")
+#st.write("cluster_profiles before recommendation:")
+st.write("cluster_profiles:")
 st.write(cluster_profiles)
 if not cluster_profiles.empty:
     cluster_profiles["recommendation"] = cluster_profiles.apply(get_recommendation, axis=1)
