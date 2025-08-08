@@ -79,20 +79,52 @@ ax.pie(cluster_counts, labels=cluster_counts.index, autopct="%1.1f%%", colors=sn
 st.pyplot(fig)
 
 st.subheader("Parallel Coordinates Plot")
+
+# Parallel Coordinates Plot using cluster averages
+st.subheader("Parallel Coordinates Plot (Cluster Averages)")
+cluster_means = features.groupby("cluster")[selected_features].mean().reset_index()
 from pandas.plotting import parallel_coordinates
 fig, ax = plt.subplots(figsize=(10,5))
-parallel_coordinates(features[["cluster"] + selected_features], "cluster", color=sns.color_palette("muted"))
+parallel_coordinates(cluster_means, "cluster", color=sns.color_palette("muted"))
 st.pyplot(fig)
 
 st.subheader("Interactive User Explorer")
+
+# Interactive User Explorer: show only 5 sample users for performance
 selected_cluster = st.selectbox("Select Cluster", sorted(features["cluster"].unique()))
 cluster_users = features[features["cluster"] == selected_cluster]
-st.write(cluster_users.head(10))
+st.write(cluster_users.head(5))
+
+#sil_score = get_silhouette(scaled, labels)
+#if sil_score:
+#    st.write(f"Silhouette Score: {sil_score:.2f}")
 
 st.subheader("Cluster Insights")
 st.write("Cluster Profiles:")
 st.write(cluster_users[selected_features].describe())
 
-sil_score = get_silhouette(scaled, labels)
-if sil_score:
-    st.write(f"Silhouette Score: {sil_score:.2f}")
+# Example cluster recommendations
+
+st.subheader("Cluster Recommendations")
+st.write("Reached recommendations section")
+st.write("cluster_means:")
+st.write(cluster_means)
+def get_recommendation(row):
+    # Example logic based on total_orders and avg_order_size
+    if row.get("total_orders", 0) > features["total_orders"].quantile(0.75):
+        return "High-frequency buyers: Offer loyalty rewards, exclusive deals, and early access to new products."
+    elif row.get("avg_order_size", 0) > features["avg_order_size"].quantile(0.75):
+        return "Bulk shoppers: Provide bundle discounts, free shipping for large orders, and bulk promotions."
+    elif row.get("avg_days_between_orders", 0) > features["avg_days_between_orders"].quantile(0.75):
+        return "Occasional shoppers: Send re-engagement emails, personalized recommendations, and reminders."
+    else:
+        return "Average shoppers: Maintain regular promotions and highlight popular products."
+
+cluster_profiles = cluster_means.copy()
+st.write("cluster_profiles before recommendation:")
+st.write(cluster_profiles)
+if not cluster_profiles.empty:
+    cluster_profiles["recommendation"] = cluster_profiles.apply(get_recommendation, axis=1)
+    st.write(cluster_profiles[["cluster", "recommendation"]])
+else:
+    st.write("No cluster profiles to recommend for.")
