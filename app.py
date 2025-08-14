@@ -172,3 +172,6 @@ st.write(group_users.head(10))
 st.subheader("Customer Group Insights")
 st.write("Customer Group Profiles:")
 st.write(group_users[viz_features].describe())
+
+# note to self: do you need algorithm selection?, add a button to choose whether to 
+# see all feature or only select feature, change parallel coordinates plot labels?
