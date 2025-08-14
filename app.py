@@ -132,6 +132,18 @@ sns.set(font_scale=0.6)
 # st.pyplot(fig)
 
 
+# Sidebar toggle for feature selection in plots
+show_all_features = st.sidebar.radio(
+    "Show plots/tables with:",
+    ["All features", "Selected features"],
+    index=0
+)
+
+if show_all_features == "All features":
+    plot_features = viz_features
+else:
+    plot_features = selected_features_raw
+
 st.subheader("Customer Group Size Pie Chart")
 group_counts = features["customer_group_name"].value_counts()
 fig, ax = plt.subplots()
@@ -139,7 +151,7 @@ ax.pie(group_counts, labels=group_counts.index, autopct="%1.1f%%", colors=sns.co
 st.pyplot(fig)
 
 st.subheader("Feature Distribution by Customer Group")
-for feat in viz_features:
+for feat in plot_features:
     fig, ax = plt.subplots()
     label = feature_name_map.get(feat, feat)
     sns.boxplot(x="customer_group_name", y=feat, data=features, palette="pastel", ax=ax)
@@ -148,18 +160,8 @@ for feat in viz_features:
     plt.tight_layout()
     st.pyplot(fig)
 
-
-# st.subheader("Customer Group Size Pie Chart")
-# group_counts = features["customer_group_name"].value_counts()
-# fig, ax = plt.subplots()
-# ax.pie(group_counts, labels=group_counts.index, autopct="%1.1f%%", colors=sns.color_palette("pastel"))
-# st.pyplot(fig)
-
-
-sns.set(font_scale=1.0) 
-
 st.subheader("Parallel Coordinates Plot (Customer Group Averages)")
-customer_means_profile = features.groupby("customer_group_name")[viz_features].mean().reset_index()
+customer_means_profile = features.groupby("customer_group_name")[plot_features].mean().reset_index()
 fig, ax = plt.subplots(figsize=(10,5))
 parallel_coordinates(customer_means_profile, "customer_group_name", color=sns.color_palette("muted"))
 st.pyplot(fig)
@@ -171,7 +173,7 @@ st.write(group_users.head(10))
 
 st.subheader("Customer Group Insights")
 st.write("Customer Group Profiles:")
-st.write(group_users[viz_features].describe())
+st.write(group_users[plot_features].describe())
 
 # note to self: do you need algorithm selection?, add a button to choose whether to 
 # see all feature or only select feature, change parallel coordinates plot labels?
