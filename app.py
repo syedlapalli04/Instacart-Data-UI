@@ -90,6 +90,7 @@ else:
 
 features["customer_group"] = labels
 
+
 # PCA for visualization
 reduced, pca = run_pca(scaled, n_components=2)
 features["pca1"] = reduced[:,0]
@@ -124,9 +125,17 @@ else:
 
 sns.set(font_scale=0.6) 
 
-st.subheader("Customer Group Scatter Plot (PCA)")
+
+# st.subheader("Customer Group Scatter Plot (PCA)")
+# fig, ax = plt.subplots()
+# sns.scatterplot(x="pca1", y="pca2", hue="customer_group_name", palette="muted", data=features, ax=ax)
+# st.pyplot(fig)
+
+
+st.subheader("Customer Group Size Pie Chart")
+group_counts = features["customer_group_name"].value_counts()
 fig, ax = plt.subplots()
-sns.scatterplot(x="pca1", y="pca2", hue="customer_group_name", palette="muted", data=features, ax=ax)
+ax.pie(group_counts, labels=group_counts.index, autopct="%1.1f%%", colors=sns.color_palette("pastel"))
 st.pyplot(fig)
 
 st.subheader("Feature Distribution by Customer Group")
@@ -139,11 +148,13 @@ for feat in viz_features:
     plt.tight_layout()
     st.pyplot(fig)
 
-st.subheader("Customer Group Size Pie Chart")
-group_counts = features["customer_group_name"].value_counts()
-fig, ax = plt.subplots()
-ax.pie(group_counts, labels=group_counts.index, autopct="%1.1f%%", colors=sns.color_palette("pastel"))
-st.pyplot(fig)
+
+# st.subheader("Customer Group Size Pie Chart")
+# group_counts = features["customer_group_name"].value_counts()
+# fig, ax = plt.subplots()
+# ax.pie(group_counts, labels=group_counts.index, autopct="%1.1f%%", colors=sns.color_palette("pastel"))
+# st.pyplot(fig)
+
 
 sns.set(font_scale=1.0) 
 
