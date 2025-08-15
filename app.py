@@ -53,6 +53,10 @@ if st.session_state["page"] == "welcome":
 
 st.write("Segment customers based on their order behavior and explore clusters interactively.")
 
+st.markdown("""
+**The dataset covers up to approximately 1 year of order history per customer, based on cumulative days between orders.**
+""")
+
 # File paths (update as needed)
 orders_path = "data/orders.csv"
 prior_path = "data/order_products__prior.csv"
@@ -177,3 +181,6 @@ st.write(group_users[plot_features].describe())
 
 # note to self: do you need algorithm selection?, add a button to choose whether to 
 # see all feature or only select feature, change parallel coordinates plot labels?
+
+# create readme, record video (not more than 30 seconds) and upload to github, link to jyupter notebook too
+# or just use sample of data
