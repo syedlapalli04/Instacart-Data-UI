@@ -154,15 +154,26 @@ fig, ax = plt.subplots()
 ax.pie(group_counts, labels=group_counts.index, autopct="%1.1f%%", colors=sns.color_palette("pastel"))
 st.pyplot(fig)
 
-st.subheader("Feature Distribution by Customer Group")
-for feat in plot_features:
-    fig, ax = plt.subplots()
-    label = feature_name_map.get(feat, feat)
-    sns.boxplot(x="customer_group_name", y=feat, data=features, palette="pastel", ax=ax)
-    ax.set_xlabel("Customer Group")
-    ax.set_ylabel(label)
-    plt.tight_layout()
-    st.pyplot(fig)
+
+# Toggle for boxplots
+
+# Toggle for boxplots in sidebar
+if "show_boxplots" not in st.session_state:
+    st.session_state["show_boxplots"] = False
+
+if st.sidebar.button("Show Boxplots" if not st.session_state["show_boxplots"] else "Hide Boxplots"):
+    st.session_state["show_boxplots"] = not st.session_state["show_boxplots"]
+
+if st.session_state["show_boxplots"]:
+    st.subheader("Feature Distribution by Customer Group")
+    for feat in plot_features:
+        fig, ax = plt.subplots()
+        label = feature_name_map.get(feat, feat)
+        sns.boxplot(x="customer_group_name", y=feat, data=features, palette="pastel", ax=ax)
+        ax.set_xlabel("Customer Group")
+        ax.set_ylabel(label)
+        plt.tight_layout()
+        st.pyplot(fig)
 
 st.subheader("Parallel Coordinates Plot (Customer Group Averages)")
 customer_means_profile = features.groupby("customer_group_name")[plot_features].mean().reset_index()
