@@ -72,9 +72,18 @@ features = get_features()
 feature_cols = [col for col in features.columns if col not in ["user_id"]]
 
 st.sidebar.header("Customer Grouping Parameters")
-algorithm = st.sidebar.selectbox("Algorithm", ["KMeans", "DBSCAN"])
+
+
+# Algorithm selection (only KMeans)
+st.sidebar.markdown("**Algorithm:**")
+algorithm = st.sidebar.selectbox("", ["KMeans"], index=0)
+
+st.sidebar.markdown("**Number of Customer Groups (KMeans):**")
+n_clusters = st.sidebar.slider("", 2, 4, 4)
+
+st.sidebar.markdown("**Features for Clustering:**")
 selected_features = st.sidebar.multiselect(
-    "Features", [feature_name_map.get(f, f) for f in feature_cols], default=[feature_name_map.get(f, f) for f in feature_cols]
+    "", [feature_name_map.get(f, f) for f in feature_cols], default=[feature_name_map.get(f, f) for f in feature_cols]
 )
 
 # Map selected features back to original names
@@ -84,13 +93,7 @@ if not selected_features_raw:
 
 scaled, scaler = scale_features(features, selected_features_raw)
 
-if algorithm == "KMeans":
-    n_clusters = st.sidebar.slider("Number of Customer Groups", 2, 4, 4)
-    labels, model = run_kmeans(scaled, n_clusters)
-else:
-    eps = st.sidebar.slider("DBSCAN eps", 0.1, 2.0, 0.5)
-    min_samples = st.sidebar.slider("DBSCAN min_samples", 2, 20, 5)
-    labels, model = run_dbscan(scaled, eps, min_samples)
+labels, model = run_kmeans(scaled, n_clusters)
 
 features["customer_group"] = labels
 
@@ -158,18 +161,23 @@ st.pyplot(fig)
 # Toggle for boxplots
 
 # Toggle for boxplots in sidebar
-if "show_boxplots" not in st.session_state:
-    st.session_state["show_boxplots"] = False
 
-if st.sidebar.button("Show Boxplots" if not st.session_state["show_boxplots"] else "Hide Boxplots"):
-    st.session_state["show_boxplots"] = not st.session_state["show_boxplots"]
+st.sidebar.markdown("**Boxplot Display Options:**")
+boxplot_option = st.sidebar.radio(
+    "",
+    ["Show boxplot with outliers", "Show boxplot without outliers", "Hide boxplot"],
+    index=2
+)
 
-if st.session_state["show_boxplots"]:
+if boxplot_option != "Hide boxplot":
     st.subheader("Feature Distribution by Customer Group")
     for feat in plot_features:
         fig, ax = plt.subplots()
         label = feature_name_map.get(feat, feat)
-        sns.boxplot(x="customer_group_name", y=feat, data=features, palette="pastel", ax=ax)
+        if boxplot_option == "Show boxplot without outliers":
+            sns.boxplot(x="customer_group_name", y=feat, data=features, palette="pastel", ax=ax, showfliers=False)
+        else:
+            sns.boxplot(x="customer_group_name", y=feat, data=features, palette="pastel", ax=ax)
         ax.set_xlabel("Customer Group")
         ax.set_ylabel(label)
         plt.tight_layout()
