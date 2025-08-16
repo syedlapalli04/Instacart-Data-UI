@@ -46,6 +46,8 @@ if st.session_state["page"] == "welcome":
     st.markdown("""
     This dashboard helps you explore and segment Instacart customers based on their order behavior. 
     You can view customer groups, analyze their characteristics, and visualize patterns interactively.
+    
+    _Note: Currently, customer groups are created using the KMeans clustering algorithm. This site is actively evolving, and future updates will introduce additional segmentation methods to provide deeper insights into customer behavior._
     """)
     if st.button("Start Analysis"):
         st.session_state["page"] = "analysis"
@@ -177,10 +179,16 @@ if boxplot_option != "Hide boxplot":
         plt.tight_layout()
         st.pyplot(fig)
 
-st.subheader("Parallel Coordinates Plot (Customer Group Averages)")
+
+# Use display names for parallel coordinates plot x-axis
 customer_means_profile = features.groupby("customer_group_name")[plot_features].mean().reset_index()
+# Use display names for parallel coordinates plot x-axis
+display_feature_names = [feature_name_map.get(f, f) for f in plot_features]
+customer_means_profile_disp = customer_means_profile.copy()
+customer_means_profile_disp.columns = ["customer_group_name"] + display_feature_names
 fig, ax = plt.subplots(figsize=(10,5))
-parallel_coordinates(customer_means_profile, "customer_group_name", color=sns.color_palette("muted"))
+parallel_coordinates(customer_means_profile_disp, "customer_group_name", color=sns.color_palette("muted"))
+ax.set_xlabel("Features")
 st.pyplot(fig)
 
 st.subheader("Interactive Customer Group Explorer")
