@@ -74,16 +74,10 @@ feature_cols = [col for col in features.columns if col not in ["user_id"]]
 st.sidebar.header("Customer Grouping Parameters")
 
 
-# Algorithm selection (only KMeans)
-st.sidebar.markdown("**Algorithm:**")
-algorithm = st.sidebar.selectbox("", ["KMeans"], index=0)
-
-st.sidebar.markdown("**Number of Customer Groups (KMeans):**")
-n_clusters = st.sidebar.slider("", 2, 4, 4)
-
-st.sidebar.markdown("**Features for Clustering:**")
+algorithm = st.sidebar.selectbox("**Algorithm:**", ["KMeans"], index=0)
+n_clusters = st.sidebar.slider("**Number of Customer Groups (KMeans):**", 2, 4, 4)
 selected_features = st.sidebar.multiselect(
-    "", [feature_name_map.get(f, f) for f in feature_cols], default=[feature_name_map.get(f, f) for f in feature_cols]
+    "**Features for Clustering:**", [feature_name_map.get(f, f) for f in feature_cols], default=[feature_name_map.get(f, f) for f in feature_cols]
 )
 
 # Map selected features back to original names
@@ -141,7 +135,7 @@ sns.set(font_scale=0.6)
 
 # Sidebar toggle for feature selection in plots
 show_all_features = st.sidebar.radio(
-    "Show plots/tables with:",
+    "**Show plots/tables with:**",
     ["All features", "Selected features"],
     index=0
 )
@@ -162,9 +156,8 @@ st.pyplot(fig)
 
 # Toggle for boxplots in sidebar
 
-st.sidebar.markdown("**Boxplot Display Options:**")
 boxplot_option = st.sidebar.radio(
-    "",
+    "**Boxplot Display Options:**",
     ["Show boxplot with outliers", "Show boxplot without outliers", "Hide boxplot"],
     index=2
 )
