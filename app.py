@@ -87,8 +87,9 @@ if not selected_features_raw:
 
 scaled, scaler = scale_features(features, selected_features_raw)
 
-labels, model = run_kmeans(scaled, n_clusters)
 
+labels, model = run_kmeans(scaled, n_clusters)
+labels = labels + 1  # Start customer group numbering from 1
 features["customer_group"] = labels
 
 
