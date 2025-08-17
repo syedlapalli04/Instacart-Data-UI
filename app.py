@@ -46,12 +46,33 @@ if st.session_state["page"] == "welcome":
     st.markdown("""
     This dashboard helps you explore and segment Instacart customers based on their order behavior. 
     You can view customer groups, analyze their characteristics, and visualize patterns interactively.
+    
+    _Note: Currently, customer groups are created using the KMeans clustering algorithm. This site is actively evolving, and future updates will introduce additional segmentation methods to provide deeper insights into customer behavior._
     """)
     if st.button("Start Analysis"):
         st.session_state["page"] = "analysis"
     st.stop()
 
 st.write("Segment customers based on their order behavior and explore clusters interactively.")
+
+st.markdown("""
+**The dataset covers up to approximately 1 year of order history per customer, based on cumulative days between orders.**
+
+---
+
+
+**What you'll see in this dashboard:**
+- **Recommendations Table:** See suggestions for how to engage each group based on their shopping style.
+- **Customer Group Size Pie Chart:** Shows how many shoppers are in each group.
+- **Feature Distribution Boxplots:** Compare how different groups shop for each selected feature.
+- **Parallel Coordinates Plot:** Visualizes the average shopping habits for each group across all selected features.
+- **Interactive Group Explorer:** Browse and view details for shoppers in any group.
+- **Customer Group Insights Table:** See summary statistics for the selected group and features.
+
+Each graph and table helps you understand patterns in shopping behavior, compare groups, and get ideas for how to engage different types of shoppers.
+            
+---        
+""")
 
 # File paths (update as needed)
 orders_path = "data/orders.csv"
@@ -68,9 +89,12 @@ features = get_features()
 feature_cols = [col for col in features.columns if col not in ["user_id"]]
 
 st.sidebar.header("Customer Grouping Parameters")
-algorithm = st.sidebar.selectbox("Algorithm", ["KMeans", "DBSCAN"])
+
+
+algorithm = st.sidebar.selectbox("**Algorithm:**", ["KMeans"], index=0)
+n_clusters = st.sidebar.slider("**Number of Customer Groups (KMeans):**", 2, 4, 4)
 selected_features = st.sidebar.multiselect(
-    "Features", [feature_name_map.get(f, f) for f in feature_cols], default=[feature_name_map.get(f, f) for f in feature_cols]
+    "**Features for Clustering:**", [feature_name_map.get(f, f) for f in feature_cols], default=[feature_name_map.get(f, f) for f in feature_cols]
 )
 
 # Map selected features back to original names
@@ -80,14 +104,9 @@ if not selected_features_raw:
 
 scaled, scaler = scale_features(features, selected_features_raw)
 
-if algorithm == "KMeans":
-    n_clusters = st.sidebar.slider("Number of Customer Groups", 2, 4, 4)
-    labels, model = run_kmeans(scaled, n_clusters)
-else:
-    eps = st.sidebar.slider("DBSCAN eps", 0.1, 2.0, 0.5)
-    min_samples = st.sidebar.slider("DBSCAN min_samples", 2, 20, 5)
-    labels, model = run_dbscan(scaled, eps, min_samples)
 
+labels, model = run_kmeans(scaled, n_clusters)
+labels = labels + 1  # Start customer group numbering from 1
 features["customer_group"] = labels
 
 
@@ -134,7 +153,7 @@ sns.set(font_scale=0.6)
 
 # Sidebar toggle for feature selection in plots
 show_all_features = st.sidebar.radio(
-    "Show plots/tables with:",
+    "**Show plots/tables with:**",
     ["All features", "Selected features"],
     index=0
 )
@@ -150,20 +169,41 @@ fig, ax = plt.subplots()
 ax.pie(group_counts, labels=group_counts.index, autopct="%1.1f%%", colors=sns.color_palette("pastel"))
 st.pyplot(fig)
 
-st.subheader("Feature Distribution by Customer Group")
-for feat in plot_features:
-    fig, ax = plt.subplots()
-    label = feature_name_map.get(feat, feat)
-    sns.boxplot(x="customer_group_name", y=feat, data=features, palette="pastel", ax=ax)
-    ax.set_xlabel("Customer Group")
-    ax.set_ylabel(label)
-    plt.tight_layout()
-    st.pyplot(fig)
 
-st.subheader("Parallel Coordinates Plot (Customer Group Averages)")
+# Toggle for boxplots
+
+# Toggle for boxplots in sidebar
+
+boxplot_option = st.sidebar.radio(
+    "**Boxplot Display Options:**",
+    ["Show boxplot with outliers", "Show boxplot without outliers", "Hide boxplot"],
+    index=2
+)
+
+if boxplot_option != "Hide boxplot":
+    st.subheader("Feature Distribution by Customer Group")
+    for feat in plot_features:
+        fig, ax = plt.subplots()
+        label = feature_name_map.get(feat, feat)
+        if boxplot_option == "Show boxplot without outliers":
+            sns.boxplot(x="customer_group_name", y=feat, data=features, palette="pastel", ax=ax, showfliers=False)
+        else:
+            sns.boxplot(x="customer_group_name", y=feat, data=features, palette="pastel", ax=ax)
+        ax.set_xlabel("Customer Group")
+        ax.set_ylabel(label)
+        plt.tight_layout()
+        st.pyplot(fig)
+
+
+
+st.subheader("Parallel Coordinates Plot (Shopper Group Averages)")
 customer_means_profile = features.groupby("customer_group_name")[plot_features].mean().reset_index()
+display_feature_names = [feature_name_map.get(f, f) for f in plot_features]
+customer_means_profile_disp = customer_means_profile.copy()
+customer_means_profile_disp.columns = ["customer_group_name"] + display_feature_names
 fig, ax = plt.subplots(figsize=(10,5))
-parallel_coordinates(customer_means_profile, "customer_group_name", color=sns.color_palette("muted"))
+parallel_coordinates(customer_means_profile_disp, "customer_group_name", color=sns.color_palette("muted"))
+ax.set_xlabel("Features")
 st.pyplot(fig)
 
 st.subheader("Interactive Customer Group Explorer")
@@ -177,3 +217,6 @@ st.write(group_users[plot_features].describe())
 
 # note to self: do you need algorithm selection?, add a button to choose whether to 
 # see all feature or only select feature, change parallel coordinates plot labels?
+
+# create readme, record video (not more than 30 seconds) and upload to github, link to jyupter notebook too
+# or just use sample of data
