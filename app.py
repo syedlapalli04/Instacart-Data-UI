@@ -180,9 +180,9 @@ if boxplot_option != "Hide boxplot":
         st.pyplot(fig)
 
 
-# Use display names for parallel coordinates plot x-axis
+
+st.subheader("Parallel Coordinates Plot (Shopper Group Averages)")
 customer_means_profile = features.groupby("customer_group_name")[plot_features].mean().reset_index()
-# Use display names for parallel coordinates plot x-axis
 display_feature_names = [feature_name_map.get(f, f) for f in plot_features]
 customer_means_profile_disp = customer_means_profile.copy()
 customer_means_profile_disp.columns = ["customer_group_name"] + display_feature_names
