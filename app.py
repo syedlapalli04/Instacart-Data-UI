@@ -57,6 +57,21 @@ st.write("Segment customers based on their order behavior and explore clusters i
 
 st.markdown("""
 **The dataset covers up to approximately 1 year of order history per customer, based on cumulative days between orders.**
+
+---
+
+
+**What you'll see in this dashboard:**
+- **Recommendations Table:** See suggestions for how to engage each group based on their shopping style.
+- **Customer Group Size Pie Chart:** Shows how many shoppers are in each group.
+- **Feature Distribution Boxplots:** Compare how different groups shop for each selected feature.
+- **Parallel Coordinates Plot:** Visualizes the average shopping habits for each group across all selected features.
+- **Interactive Group Explorer:** Browse and view details for shoppers in any group.
+- **Customer Group Insights Table:** See summary statistics for the selected group and features.
+
+Each graph and table helps you understand patterns in shopping behavior, compare groups, and get ideas for how to engage different types of shoppers.
+            
+---        
 """)
 
 # File paths (update as needed)
