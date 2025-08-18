@@ -14,7 +14,7 @@ This project is an interactive web app that helps you explore and understand Ins
 - **Simple Controls:** Use the sidebar to easily change what you see and compare.
 
 ## Data Needed
-Note : The files should be stored in the data folder, but the CSV files are too large to directly upload to GitHub. If you would like access to the data, you can:
+Note : The data files should be stored in the data folder, but the order CSV files (order.csv, order_products__prior.csv, order_products__train.csv) are too large to directly upload to GitHub, so they have been reduced to be smaller than the limit and then uploaded. If you would like access to the original full data, you can:
 - Download the necessary files from Kaggle from the following link: https://www.kaggle.com/datasets/yasserh/instacart-online-grocery-basket-analysis-dataset
 - Contact me and I will send a zip file containing the three files needed
 
